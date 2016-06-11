@@ -3,25 +3,24 @@ public class AlienEntity extends Entity {
 
     private Game game;
     private double moveSpeed = 75;
-    private boolean flip = false;
 
     public AlienEntity(Game game, String ref, int x, int y) {
-        super(ref,x,y,true);
+        super(ref,x,y,true,true);
 
         this.game = game;
-        dx = -moveSpeed;
+        setHorizontalMovement(-moveSpeed);
     }
 
     @Override
     public void move(long delta) {
         // if we have reached the left hand side of the screen and
         // are moving left then request a logic update
-        if ((dx < 0) && (x < 10)) {
+        if ((getHorizontalMovement() < 0) && (x < 10)) {
             game.updateLogic();
         }
         // and vice vesa, if we have reached the right hand side of
         // the screen and are moving right, request a logic update
-        if ((dx > 0) && (x > 750)) {
+        if ((getHorizontalMovement() > 0) && (x > 750)) {
             game.updateLogic();
         }
 
@@ -38,7 +37,7 @@ public class AlienEntity extends Entity {
     public void doLogic() {
         // swap over horizontal movement and move down the
         // screen a bit
-        dx = -dx;
+        setHorizontalMovement(-getHorizontalMovement());
         y += 10;
 
         // if we've reached the bottom of the screen then the player
@@ -50,6 +49,9 @@ public class AlienEntity extends Entity {
 
     @Override
     public void animate() {
-        ((SpriteSheet) sprites).next();
+        if (!((SpriteSheet)sprites).isChangedThisLoop()) {
+            ((SpriteSheet) sprites).next();
+            ((SpriteSheet) sprites).setChangedThisLoop(true);
+        }
     }
 }

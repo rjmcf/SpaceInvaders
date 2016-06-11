@@ -225,13 +225,13 @@ public class Game extends Canvas {
                 if (lastAnimated >= animateTime) {
                     lastAnimated = 0;
                     for (Entity e : entities) {
-                        if (e instanceof AlienEntity) {
+                        if (e.isCurrentlyAnimated()) {
                             e.animate();
-                            break;
                         }
                     }
                 }
             }
+            SpriteStore.get().resetAnimationLoop();
 
             // cycle round drawing all the entities we have in the game
             for (int i=0;i<entities.size();i++) {
@@ -280,7 +280,7 @@ public class Game extends Canvas {
             }
             g.setColor(Color.white);
             g.drawString("Framecount:", 10,20);
-            if (!waitingForKeyPress && gameRunning) {
+            if (!waitingForKeyPress && !paused) {
                 g.drawString(Integer.toString(frames), 85,20);
             }
 

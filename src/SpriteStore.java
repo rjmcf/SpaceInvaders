@@ -104,4 +104,12 @@ public class SpriteStore {
         System.err.println(message);
         System.exit(0);
     }
+
+    public void resetAnimationLoop() {
+        for (SpriteBase sb : sprites.values()) {
+            if (sb instanceof SpriteSheet) {
+                ((SpriteSheet) sb).setChangedThisLoop(false);
+            }
+        }
+    }
 }

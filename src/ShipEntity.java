@@ -6,7 +6,7 @@ public class ShipEntity extends Entity{
     private Game game;
 
     public ShipEntity(Game game, String ref, int x, int y) {
-        super(ref,x,y,false);
+        super(ref,x,y,false,false);
 
         this.game = game;
     }
@@ -15,12 +15,12 @@ public class ShipEntity extends Entity{
     public void move(long delta) {
         // if we're moving left and have reached the left hand side
         // of the screen, don't move
-        if ((dx < 0) && (x < 10)) {
+        if ((getHorizontalMovement() < 0) && (x < 10)) {
             return;
         }
         // if we're moving right and have reached the right hand side
         // of the screen, don't move
-        if ((dx > 0) && (x > 750)) {
+        if ((getHorizontalMovement() > 0) && (x > 750)) {
             return;
         }
 

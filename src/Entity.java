@@ -6,15 +6,15 @@ public abstract class Entity {
     protected double x;
     protected double y;
     // Speeds are in pixels/second
-    protected double dx;
-    protected double dy;
-    protected boolean animated;
+    private double dx;
+    private double dy;
+    protected boolean currentlyAnimated;
     private Rectangle me = new Rectangle();
     private Rectangle him = new Rectangle();
 
-    public Entity(String ref,int x,int y, boolean isAnimated) {
-        animated = isAnimated;
-        if (animated) {
+    public Entity(String ref,int x,int y, boolean canBeAnimated, boolean isAnimated) {
+        currentlyAnimated = isAnimated;
+        if (canBeAnimated) {
             this.sprites = SpriteStore.get().getSprites(ref, 2, 40, 1);
         } else {
             this.sprites = SpriteStore.get().getSprite(ref);
@@ -29,6 +29,8 @@ public abstract class Entity {
     public void setHorizontalMovement(double dx) { this.dx = dx; }
     public double getVerticalMovement() { return dy; }
     public double getHorizontalMovement() { return dx; }
+    public boolean isCurrentlyAnimated() { return currentlyAnimated; }
+    public void setCurrentlyAnimated(boolean animated) { currentlyAnimated = animated; }
 
     public void move(long delta) {
         // update the location of the entity based on move speeds

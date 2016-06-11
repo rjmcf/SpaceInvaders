@@ -6,6 +6,7 @@ public class SpriteSheet extends SpriteBase {
     private ArrayList<Image> images = new ArrayList<>();
     private int current = 0;
     private int num;
+    private boolean changedThisLoop = false;
 
     public SpriteSheet(ArrayList<Image> images) {
         num = images.size();
@@ -23,6 +24,10 @@ public class SpriteSheet extends SpriteBase {
     public int getHeight() {
         return images.get(0).getHeight(null);
     }
+
+    public boolean isChangedThisLoop() { return changedThisLoop; }
+
+    public void setChangedThisLoop(boolean changed) { changedThisLoop = changed; }
 
     @Override
     public void draw(Graphics g, int x, int y) { g.drawImage(images.get(current), x,y, null); }

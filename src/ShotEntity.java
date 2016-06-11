@@ -6,11 +6,11 @@ public class ShotEntity extends Entity {
     private Game game;
 
     public ShotEntity(Game game, String ref, int x, int y) {
-        super(ref,x,y,false);
+        super(ref,x,y,false,false);
 
         this.game = game;
 
-        dy = moveSpeed;
+        setVerticalMovement(moveSpeed);
     }
 
     @Override
