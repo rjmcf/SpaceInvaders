@@ -4,8 +4,8 @@ public class AlienEntity extends Entity {
     private Game game;
     private double moveSpeed = 75;
 
-    public AlienEntity(Game game, String ref, int x, int y) {
-        super(ref,x,y,true,true);
+    public AlienEntity(Game game, String ref, int x, int y, int numSprites, int width, int gap) {
+        super(ref,x,y,true,true,numSprites,width,gap);
 
         this.game = game;
         setHorizontalMovement(-moveSpeed);

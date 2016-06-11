@@ -14,13 +14,18 @@ public abstract class Entity {
 
     public Entity(String ref,int x,int y, boolean canBeAnimated, boolean isAnimated) {
         currentlyAnimated = isAnimated;
-        if (canBeAnimated) {
-            this.sprites = SpriteStore.get().getSprites(ref, 2, 40, 1);
-        } else {
+        if (!canBeAnimated) {
             this.sprites = SpriteStore.get().getSprite(ref);
         }
         this.x = x;
         this.y = y;
+    }
+
+    public Entity(String ref,int x,int y, boolean canBeAnimated, boolean isAnimated, int numSprites, int width, int gap) {
+        this(ref,x,y,canBeAnimated,isAnimated);
+        if (canBeAnimated) {
+            this.sprites = SpriteStore.get().getSprites(ref,numSprites,width,gap);
+        }
     }
 
     public int getX() { return (int) x; }

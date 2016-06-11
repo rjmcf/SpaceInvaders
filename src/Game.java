@@ -116,7 +116,7 @@ public class Game extends Canvas {
         alienCount = 0;
         for (int row=0;row<5;row++) {
             for (int x=0;x<12;x++) {
-                Entity alien = new AlienEntity(this,"sprites/alien.gif",100+(x*50),(50)+row*30);
+                Entity alien = new AlienEntity(this,"sprites/alien.gif",100+(x*50),(50)+row*30, 2, 40, 1);
                 entities.add(alien);
                 alienCount++;
             }
