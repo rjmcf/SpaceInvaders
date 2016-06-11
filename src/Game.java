@@ -116,7 +116,7 @@ public class Game extends Canvas {
         alienCount = 0;
         for (int row=0;row<5;row++) {
             for (int x=0;x<12;x++) {
-                Entity alien = new AlienEntity(this,"sprites/alien.gif",100+(x*50),(50)+row*30, 2, 40, 1);
+                Entity alien = new AlienEntity(this,"sprites/alienAlt.gif",100+(x*50),(50)+row*30, 4, 40, 1);
                 entities.add(alien);
                 alienCount++;
             }
@@ -171,7 +171,7 @@ public class Game extends Canvas {
 
         // if we waited long enough, create the shot entity, and record the time.
         lastFire = System.currentTimeMillis();
-        ShotEntity shot = new ShotEntity(this,"sprites/shot.gif",ship.getX()+10,ship.getY()-30);
+        ShotEntity shot = new ShotEntity(this,"sprites/shotAlt.gif",ship.getX()+10,ship.getY()-30,4,11,1);
         entities.add(shot);
     }
 
