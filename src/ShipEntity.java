@@ -1,6 +1,4 @@
-/**
- * Created by Rjmcf on 10/06/2016.
- */
+
 public class ShipEntity extends Entity{
 
     private Game game;

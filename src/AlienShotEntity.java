@@ -1,6 +1,4 @@
-/**
- * Created by Rjmcf on 11/06/2016.
- */
+
 public class AlienShotEntity extends Entity {
     private Game game;
     private int moveSpeed = 300;

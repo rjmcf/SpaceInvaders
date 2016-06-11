@@ -1,6 +1,4 @@
-/**
- * Created by Rjmcf on 10/06/2016.
- */
+
 public class ShotEntity extends Entity {
     private double moveSpeed = -300;
     private Game game;
