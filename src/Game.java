@@ -38,9 +38,6 @@ public class Game extends Canvas {
     private int currentFrames = 0;
     private int frames = 0;
 
-    private int lastAnimated = 0;
-    private int animateTime = 500;
-
     private boolean leftPressed = false;
     private boolean rightPressed = false;
     private boolean firePressed = false;
@@ -221,13 +218,9 @@ public class Game extends Canvas {
             }
 
             if (!waitingForKeyPress && !paused) {
-                lastAnimated += delta;
-                if (lastAnimated >= animateTime) {
-                    lastAnimated = 0;
-                    for (Entity e : entities) {
-                        if (e.isCurrentlyAnimated()) {
-                            e.animate();
-                        }
+                for (Entity e : entities) {
+                    if (e.isCurrentlyAnimated()) {
+                        e.animate(delta);
                     }
                 }
             }

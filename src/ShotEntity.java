@@ -4,7 +4,7 @@ public class ShotEntity extends Entity {
     private Game game;
 
     public ShotEntity(Game game, String ref, int x, int y, int numSprites, int width, int gap) {
-        super(ref,x,y,true,true,numSprites,width,gap);
+        super(ref,x,y,true,true,50,numSprites,width,gap);
 
         this.game = game;
 
@@ -32,14 +32,6 @@ public class ShotEntity extends Entity {
 
             // notify the game that the alien has been killed
             game.notifyAlienKilled();
-        }
-    }
-
-    @Override
-    public void animate() {
-        if (!((SpriteSheet)sprites).isChangedThisLoop()) {
-            ((SpriteSheet) sprites).next();
-            ((SpriteSheet) sprites).setChangedThisLoop(true);
         }
     }
 }

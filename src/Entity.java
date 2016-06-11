@@ -8,6 +8,8 @@ public abstract class Entity {
     // Speeds are in pixels/second
     private double dx;
     private double dy;
+    protected long sinceLastFrame = 0;
+    protected long frameLength;
     protected boolean currentlyAnimated;
     private Rectangle me = new Rectangle();
     private Rectangle him = new Rectangle();
@@ -21,11 +23,10 @@ public abstract class Entity {
         this.y = y;
     }
 
-    public Entity(String ref,int x,int y, boolean canBeAnimated, boolean isAnimated, int numSprites, int width, int gap) {
+    public Entity(String ref,int x,int y, boolean canBeAnimated, boolean isAnimated, long frameLenth, int numSprites, int width, int gap) {
         this(ref,x,y,canBeAnimated,isAnimated);
-        if (canBeAnimated) {
-            this.sprites = SpriteStore.get().getSprites(ref,numSprites,width,gap);
-        }
+        this.sprites = SpriteStore.get().getSprites(ref,numSprites,width,gap);
+        this.frameLength = frameLenth;
     }
 
     public int getX() { return (int) x; }
@@ -58,6 +59,14 @@ public abstract class Entity {
 
     public void doLogic() { }
 
-    public void animate() { }
-
+    public void animate(long delta) {
+        sinceLastFrame += delta;
+        if (sinceLastFrame >= frameLength) {
+            sinceLastFrame = 0;
+            if (!((SpriteSheet)sprites).isChangedThisLoop()) {
+                ((SpriteSheet) sprites).next();
+                ((SpriteSheet) sprites).setChangedThisLoop(true);
+            }
+        }
+    }
 }

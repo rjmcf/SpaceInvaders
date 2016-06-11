@@ -5,7 +5,7 @@ public class AlienEntity extends Entity {
     private double moveSpeed = 75;
 
     public AlienEntity(Game game, String ref, int x, int y, int numSprites, int width, int gap) {
-        super(ref,x,y,true,true,numSprites,width,gap);
+        super(ref,x,y,true,true,500,numSprites,width,gap);
 
         this.game = game;
         setHorizontalMovement(-moveSpeed);
@@ -44,14 +44,6 @@ public class AlienEntity extends Entity {
         // dies
         if (y > 570) {
             game.notifyDeath();
-        }
-    }
-
-    @Override
-    public void animate() {
-        if (!((SpriteSheet)sprites).isChangedThisLoop()) {
-            ((SpriteSheet) sprites).next();
-            ((SpriteSheet) sprites).setChangedThisLoop(true);
         }
     }
 }
