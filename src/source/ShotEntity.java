@@ -1,3 +1,4 @@
+package source;
 
 public class ShotEntity extends Entity {
     private double moveSpeed = -300;

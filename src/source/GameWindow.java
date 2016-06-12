@@ -1,3 +1,4 @@
+package source;
 
 public interface GameWindow {
     void setTitle();
