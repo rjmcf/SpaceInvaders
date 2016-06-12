@@ -2,6 +2,12 @@ package source;
 
 import source.java2d.Java2DGameWindow;
 import source.java2d.Java2DSpriteStore;
+import source.jogl.JoglGameWindow;
+import source.jogl.JoglSprite;
+import source.jogl.JoglSpriteSheet;
+import source.jogl.TextureLoader;
+
+import java.util.ArrayList;
 
 public class ResourceFactory {
     // ResourceFactory is singleton
@@ -15,6 +21,8 @@ public class ResourceFactory {
 
     public static final int JAVA2D = 1;
     public static final int OPENGL_JOGL = 2;
+
+    private static ArrayList<JoglSpriteSheet> joglSpriteSheets = new ArrayList<>();
 
     private int renderingType = JAVA2D;
     private GameWindow window;
@@ -46,9 +54,8 @@ public class ResourceFactory {
                 }
                 case OPENGL_JOGL:
                 {
-                    /*window = new JoglGameWindow();
-                    break;*/
-                    throw new RuntimeException("JOGL not implemented yet");
+                    window = new JoglGameWindow();
+                    break;
                 }
             }
         }
@@ -88,8 +95,8 @@ public class ResourceFactory {
             }
             case OPENGL_JOGL:
             {
-                /*return new JoglSprite((JoglGameWindow) window,ref);*/
-                throw new RuntimeException("JOGL not implemented yet");
+                JoglSpriteSheet sSheet = new JoglSpriteSheet((JoglGameWindow) window,ref, numSprites, width, gap);
+                joglSpriteSheets.add(sSheet);
             }
         }
 
@@ -109,8 +116,9 @@ public class ResourceFactory {
             }
             case OPENGL_JOGL:
             {
-                /*return new JoglSprite((JoglGameWindow) window,ref);*/
-                throw new RuntimeException("JOGL not implemented yet");
+                for (JoglSpriteSheet sSheet : joglSpriteSheets) {
+                    sSheet.setChangedThisLoop(false);
+                }
             }
         }
 
