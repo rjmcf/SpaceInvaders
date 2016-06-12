@@ -19,7 +19,7 @@ public abstract class Entity {
     public Entity(String ref,int x,int y, boolean canBeAnimated, boolean isAnimated) {
         currentlyAnimated = isAnimated;
         if (!canBeAnimated) {
-            this.sprites = SpriteStore.get().getSprite(ref);
+            this.sprites = ResourceFactory.get().getSprite(ref);
         }
         this.x = x;
         this.y = y;
@@ -27,7 +27,7 @@ public abstract class Entity {
 
     public Entity(String ref,int x,int y, boolean canBeAnimated, boolean isAnimated, long frameLenth, int numSprites, int width, int gap) {
         this(ref,x,y,canBeAnimated,isAnimated);
-        this.sprites = SpriteStore.get().getSprites(ref,numSprites,width,gap);
+        this.sprites = ResourceFactory.get().getSprites(ref,numSprites,width,gap);
         this.frameLength = frameLenth;
     }
 
@@ -46,8 +46,8 @@ public abstract class Entity {
         y += (delta * dy) / 1000;
     }
 
-    public void draw(Graphics g) {
-        sprites.draw(g,(int) x,(int) y);
+    public void draw() {
+        sprites.draw((int) x,(int) y);
     }
 
     public boolean collidesWith(Entity other) {
@@ -65,9 +65,9 @@ public abstract class Entity {
         sinceLastFrame += delta;
         if (sinceLastFrame >= frameLength) {
             sinceLastFrame = 0;
-            if (!((SpriteSheet)sprites).isChangedThisLoop()) {
-                ((SpriteSheet) sprites).next();
-                ((SpriteSheet) sprites).setChangedThisLoop(true);
+            if (!((SpriteSheetBase)sprites).isChangedThisLoop()) {
+                ((SpriteSheetBase) sprites).next();
+                ((SpriteSheetBase) sprites).setChangedThisLoop(true);
             }
         }
     }

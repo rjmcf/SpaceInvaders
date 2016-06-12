@@ -1,97 +1,75 @@
 package source;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 import java.awt.Canvas;
-import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Color;
-import java.awt.image.BufferStrategy;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyAdapter;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.swing.JOptionPane;
 
-public class Game extends Canvas {
-    private BufferStrategy strategy;
+
+public class Game extends Canvas implements GameWindowCallback{
+    private GameWindow window;
     private boolean gameRunning = true;
     private boolean paused = false;
 
     private Random r = new Random();
 
-    private String message = "";
+    private SpriteBase message;
+    private SpriteBase pressAnyKey;
+    private SpriteBase youWin;
+    private SpriteBase gotYou;
     private boolean waitingForKeyPress = true;
 
     private ShipEntity ship;
     private double moveSpeed = 300;
+    private long lastFire = 0;
+    private long firingInterval = 500;
+    private boolean fireHasBeenReleased = false;
 
     private int alienCount;
-
-    private long lastFire = 0;
-
     private int fireChance;
-
-    private long firingInterval = 500;
 
     private int lastFrame = 0;
     private int currentFrames = 0;
-    private int frames = 0;
+    private long lastLoopTime = System.currentTimeMillis();
+    private long delta;
 
-    private boolean leftPressed = false;
-    private boolean rightPressed = false;
-    private boolean firePressed = false;
     private boolean logicRequiredThisLoop = false;
 
     private ArrayList<Entity> entities = new ArrayList<>();
     private ArrayList<Entity> removeList = new ArrayList<>();
 
-    public Game() {
-        // This frame contains our game
-        JFrame container = new JFrame("Space Invaders 101");
+    private String windowTitle = "Space Invaders 103 - Version (0.3)";
 
-        // This panel is the actual content of our frame.
-        JPanel panel = (JPanel) container.getContentPane();
-        panel.setPreferredSize(new Dimension(800,600));
-        panel.setLayout(null);
+    public Game(int renderingType) {
+        // create a window based on a chosen rendering method
+        ResourceFactory.get().setRenderingType(renderingType);
+        window = ResourceFactory.get().getGameWindow();
 
-        // Sets bounds of our game, and places it in frame
-        setBounds(0,0,800,600);
-        panel.add(this);
+        window.setResolution(800,600);
+        window.setGameWindowCallback(this);
+        window.setTitle(windowTitle);
 
-        // Tells AWT not to bother repainting our canvas since we're going to do that ourselves in accelerated mode
-        setIgnoreRepaint(true);
+    }
 
-        // Make the window visible, and also disallow player from resizing it.
-        container.pack();
-        container.setResizable(false);
-        container.setVisible(true);
+    public void startRendering() {
+        window.startRendering();
+    }
 
-        // add a listener to respond to the user closing the window. If they
-        // do we'd like to exit the game
-        container.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                System.exit(0);
-            }
-        });
+    @Override
+    public void initialise() {
+        gotYou = ResourceFactory.get().getSprite("sprites/gotyou.gif");
+        pressAnyKey = ResourceFactory.get().getSprite("sprites/pressanykey.gif");
+        youWin = ResourceFactory.get().getSprite("sprites/youwin.gif");
 
-        // add a key input system (defined below) to our canvas
-        // so we can respond to key pressed
-        addKeyListener(new KeyInputHandler());
+        message = pressAnyKey;
 
-        // request the focus so key events come to us
-        requestFocus();
-
-        // A buffer strategy allows us to use accelerated graphics. We will use 2 buffers.
-        createBufferStrategy(2);
-        strategy = getBufferStrategy();
-
-        // initialise the entities in our game so there's something
-        // to see at startup
-        initEntities();
-
+        // setup the initial game state
+        startGame();
     }
 
     private void startGame() {
@@ -99,10 +77,6 @@ public class Game extends Canvas {
         entities.clear();
         initEntities();
 
-        // blank out any keyboard settings we might currently have
-        leftPressed = false;
-        rightPressed = false;
-        firePressed = false;
         fireChance = 5000;
     }
 
@@ -131,12 +105,12 @@ public class Game extends Canvas {
     }
 
     public void notifyDeath() {
-        message = "Oh no! They got you, try again?";
+        message = gotYou;
         waitingForKeyPress = true;
     }
 
     public void notifyWin() {
-        message = "Well done! You Win!";
+        message = youWin;
         waitingForKeyPress = true;
     }
 
@@ -180,118 +154,100 @@ public class Game extends Canvas {
     }
 
     // Our actual game loop
-    public void gameLoop() {
-        long lastLoopTime = System.currentTimeMillis();
-        long delta;
+    @Override
+    public void frameRendering() {
 
-        while(gameRunning) {
-            // How long since last update?
-            delta = System.currentTimeMillis() - lastLoopTime;
-            lastLoopTime = System.currentTimeMillis();
-            lastFrame += delta;
+        // How long since last update?
+        delta = System.currentTimeMillis() - lastLoopTime;
+        lastLoopTime = System.currentTimeMillis();
+        lastFrame += delta;
+        currentFrames++;
 
-            if (lastFrame >= 1000) {
-                lastFrame = 0;
-                frames = currentFrames;
-                currentFrames = 0;
-            }
+        if (lastFrame >= 1000) {
+            lastFrame = 0;
+            window.setTitle(windowTitle+" (FPS: "+currentFrames+")");
+            currentFrames = 0;
+        }
 
-            // Get graphics context for accelerated surface and blank it out
-            Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
-            g.setColor(Color.black);
-            g.fillRect(0,0,800,600);
+        // cycle round asking each entity to move itself
+        if (!waitingForKeyPress && !paused) {
+            for (int i=0;i<entities.size();i++) {
+                Entity entity = (Entity) entities.get(i);
 
+                entity.move(delta);
 
-
-            // cycle round asking each entity to move itself
-            if (!waitingForKeyPress && !paused) {
-                for (int i=0;i<entities.size();i++) {
-                    Entity entity = (Entity) entities.get(i);
-
-                    entity.move(delta);
-
-                    if (entity instanceof AlienEntity) {
-                        int fire = r.nextInt(fireChance);
-                        if (fire == 1) {
-                            enemyFire((AlienEntity) entity);
-                        }
+                if (entity instanceof AlienEntity) {
+                    int fire = r.nextInt(fireChance);
+                    if (fire == 1) {
+                        enemyFire((AlienEntity) entity);
                     }
                 }
             }
+        }
 
-            if (!waitingForKeyPress && !paused) {
-                for (Entity e : entities) {
-                    if (e.isCurrentlyAnimated()) {
-                        e.animate(delta);
-                    }
+        if (!waitingForKeyPress && !paused) {
+            for (Entity e : entities) {
+                if (e.isCurrentlyAnimated()) {
+                    e.animate(delta);
                 }
             }
-            SpriteStore.get().resetAnimationLoop();
+        }
+        ResourceFactory.get().resetAnimationLoop();
 
-            // cycle round drawing all the entities we have in the game
+        // cycle round drawing all the entities we have in the game
+        for (int i=0;i<entities.size();i++) {
+            Entity entity = entities.get(i);
+
+            entity.draw();
+        }
+
+        // brute force collisions, compare every entity against
+        // every other entity. If any of them collide notify
+        // both entities that the collision has occurred
+        for (int p=0;p<entities.size();p++) {
+            for (int s=p+1;s<entities.size();s++) {
+                Entity me = (Entity) entities.get(p);
+                Entity him = (Entity) entities.get(s);
+
+                if (me.collidesWith(him)) {
+                    me.collidedWith(him);
+                    him.collidedWith(me);
+                }
+            }
+        }
+
+        // remove any entity that has been marked for clear up
+        entities.removeAll(removeList);
+        removeList.clear();
+
+        // if a game event has indicated that game logic should
+        // be resolved, cycle round every entity requesting that
+        // their personal logic should be considered.
+        if (logicRequiredThisLoop) {
             for (int i=0;i<entities.size();i++) {
                 Entity entity = entities.get(i);
-
-                entity.draw(g);
+                entity.doLogic();
             }
 
-            // brute force collisions, compare every entity against
-            // every other entity. If any of them collide notify
-            // both entities that the collision has occurred
-            for (int p=0;p<entities.size();p++) {
-                for (int s=p+1;s<entities.size();s++) {
-                    Entity me = (Entity) entities.get(p);
-                    Entity him = (Entity) entities.get(s);
+            logicRequiredThisLoop = false;
+        }
 
-                    if (me.collidesWith(him)) {
-                        me.collidedWith(him);
-                        him.collidedWith(me);
-                    }
-                }
-            }
+        // if we're waiting for an "any key" press then draw the
+        // current message
+        if (waitingForKeyPress) {
+            message.draw(325,250);
+        }
 
-            // remove any entity that has been marked for clear up
-            entities.removeAll(removeList);
-            removeList.clear();
+        // resolve the movement of the ship. First assume the ship
+        // isn't moving. If either cursor key is pressed then
+        // update the movement appropriately
+        ship.setHorizontalMovement(0);
 
-            // if a game event has indicated that game logic should
-            // be resolved, cycle round every entity requesting that
-            // their personal logic should be considered.
-            if (logicRequiredThisLoop) {
-                for (int i=0;i<entities.size();i++) {
-                    Entity entity = entities.get(i);
-                    entity.doLogic();
-                }
+        boolean leftPressed = window.isKeyPressed(KeyEvent.VK_LEFT);
+        boolean rightPressed = window.isKeyPressed(KeyEvent.VK_RIGHT);
+        boolean firePressed = window.isKeyPressed(KeyEvent.VK_SPACE);
 
-                logicRequiredThisLoop = false;
-            }
-
-            // if we're waiting for an "any key" press then draw the
-            // current message
-            if (waitingForKeyPress) {
-                g.setColor(Color.white);
-                g.drawString(message,(800-g.getFontMetrics().stringWidth(message))/2,250);
-                g.drawString("Press any key",(800-g.getFontMetrics().stringWidth("Press any key"))/2,300);
-            }
-            g.setColor(Color.white);
-            g.drawString("Framecount:", 10,20);
-            if (!waitingForKeyPress && !paused) {
-                g.drawString(Integer.toString(frames), 85,20);
-            }
-
-            if (paused) {
-                g.drawString("Paused", (800-g.getFontMetrics().stringWidth("Paused"))/2, 300);
-            }
-
-            // We've drawn enough, so clear graphics and flip buffer
-            g.dispose();
-            strategy.show();
-
-            // resolve the movement of the ship. First assume the ship
-            // isn't moving. If either cursor key is pressed then
-            // update the movement appropriately
-            ship.setHorizontalMovement(0);
-
+        if (!waitingForKeyPress) {
             if ((leftPressed) && (!rightPressed)) {
                 ship.setHorizontalMovement(-moveSpeed);
             } else if ((rightPressed) && (!leftPressed)) {
@@ -302,91 +258,45 @@ public class Game extends Canvas {
             if (firePressed) {
                 tryToFire();
             }
-
-            currentFrames++;
-
-            // Wait a bit
-            try { Thread.sleep(10); } catch (InterruptedException e) { e.printStackTrace(); }
+        } else {
+            if (!firePressed) {
+                fireHasBeenReleased = true;
+            }
+            if ((firePressed) && (fireHasBeenReleased)) {
+                waitingForKeyPress = false;
+                fireHasBeenReleased = false;
+                startGame();
+            }
         }
+
+        // if escape has been pressed, stop the game
+        if (window.isKeyPressed(KeyEvent.VK_ESCAPE)) {
+            System.exit(0);
+        }
+
+        // Wait a bit
+        try { Thread.sleep(10); } catch (InterruptedException e) { e.printStackTrace(); }
     }
 
-    private class KeyInputHandler extends KeyAdapter {
-        /** The number of key presses we've had while waiting for an "any key" press */
-        private int pressCount = 1;
-
-        public void keyPressed(KeyEvent e) {
-            // if we're waiting for an "any key" typed then we don't
-            // want to do anything with just a "press"
-            if (waitingForKeyPress) {
-                return;
-            }
 
 
-            if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                leftPressed = true;
-            }
-            if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                rightPressed = true;
-            }
-            if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-                firePressed = true;
-            }
-        }
-
-        public void keyReleased(KeyEvent e) {
-            // if we're waiting for an "any key" typed then we don't
-            // want to do anything with just a "released"
-            if (waitingForKeyPress) {
-                return;
-            }
-
-            if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                leftPressed = false;
-            }
-            if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                rightPressed = false;
-            }
-            if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-                firePressed = false;
-            }
-        }
-
-        public void keyTyped(KeyEvent e) {
-            // if we're waiting for a "any key" type then
-            // check if we've recieved any recently. We may
-            // have had a keyType() event from the user releasing
-            // the shoot or move keys, hence the use of the "pressCount"
-            // counter.
-            if (waitingForKeyPress) {
-                if (pressCount == 1) {
-                    // since we've now recieved our key typed
-                    // event we can mark it as such and start
-                    // our new game
-                    waitingForKeyPress = false;
-                    startGame();
-                    pressCount = 0;
-                } else {
-                    pressCount++;
-                }
-            }
-
-            // if we hit escape, then quit the game
-            if (e.getKeyChar() == KeyEvent.VK_ESCAPE) {
-                System.exit(0);
-            }
-
-            if (e.getKeyChar() == 'p') {
-                paused = !paused;
-            }
-        }
+    @Override
+    public void windowClosed() {
+        System.exit(0);
     }
 
 
 
     // Our entry point to the game
-    public static void main(String[] args) {
-        Game g = new Game();
+    public static void main(String argv[]) {
+        int result = JOptionPane.showOptionDialog(null,"Java2D or OpenGL?","Java2D or OpenGL?",JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,new String[] {"Java2D","OpenGL"},null);
 
-        g.gameLoop();
+        if (result == 0) {
+            Game g = new Game(ResourceFactory.JAVA2D);
+            g.startRendering();
+        } else if (result == 1) {
+            Game g = new Game(ResourceFactory.OPENGL_JOGL);
+            g.startRendering();
+        }
     }
 }
