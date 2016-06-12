@@ -1,7 +1,6 @@
 package source;
 
 import java.awt.Rectangle;
-import java.awt.Graphics;
 
 public abstract class Entity {
     protected SpriteBase sprites;
