@@ -1,4 +1,4 @@
-package source.Java2D;
+package source.java2d;
 
 import java.awt.Image;
 

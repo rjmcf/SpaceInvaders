@@ -1,7 +1,7 @@
 package source;
 
-import source.Java2D.Java2DGameWindow;
-import source.Java2D.Java2DSpriteStore;
+import source.java2d.Java2DGameWindow;
+import source.java2d.Java2DSpriteStore;
 
 public class ResourceFactory {
     // ResourceFactory is singleton
