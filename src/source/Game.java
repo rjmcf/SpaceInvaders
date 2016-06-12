@@ -13,7 +13,6 @@ import javax.swing.JOptionPane;
 
 public class Game extends Canvas implements GameWindowCallback{
     private GameWindow window;
-    private boolean gameRunning = true;
     private boolean paused = false;
 
     private Random r = new Random();
