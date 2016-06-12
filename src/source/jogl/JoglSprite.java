@@ -40,7 +40,7 @@ public class JoglSprite implements SpriteBase{
 
     @Override
     public void draw(int x, int y) {
-        // get hold of the GL content from the window in which we're drawning
+        /*// get hold of the GL content from the window in which we're drawning
         GL gl = window.getGL();
 
         // store the current model matrix
@@ -67,6 +67,6 @@ public class JoglSprite implements SpriteBase{
         gl.glEnd();
 
         // restore the model view matrix to prevent contamination
-        gl.glPopMatrix();
+        gl.glPopMatrix();*/
     }
 }

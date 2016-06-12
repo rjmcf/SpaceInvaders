@@ -54,8 +54,9 @@ public class ResourceFactory {
                 }
                 case OPENGL_JOGL:
                 {
-                    window = new JoglGameWindow();
-                    break;
+                    /*window = new JoglGameWindow();
+                    break;*/
+                    throw new RuntimeException("JOGL not implemented yet");
                 }
             }
         }
@@ -95,8 +96,9 @@ public class ResourceFactory {
             }
             case OPENGL_JOGL:
             {
-                JoglSpriteSheet sSheet = new JoglSpriteSheet((JoglGameWindow) window,ref, numSprites, width, gap);
-                joglSpriteSheets.add(sSheet);
+                /*JoglSpriteSheet sSheet = new JoglSpriteSheet((JoglGameWindow) window,ref, numSprites, width, gap);
+                joglSpriteSheets.add(sSheet);*/
+                throw new RuntimeException("JOGL not implemented yet");
             }
         }
 
@@ -116,9 +118,10 @@ public class ResourceFactory {
             }
             case OPENGL_JOGL:
             {
-                for (JoglSpriteSheet sSheet : joglSpriteSheets) {
+                /*for (JoglSpriteSheet sSheet : joglSpriteSheets) {
                     sSheet.setChangedThisLoop(false);
-                }
+                }*/
+                throw new RuntimeException("JOGL not implemented yet");
             }
         }
 

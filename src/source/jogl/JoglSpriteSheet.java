@@ -45,7 +45,7 @@ public class JoglSpriteSheet implements SpriteSheetBase{
 
     @Override
     public void draw(int x, int y) {
-        // get hold of the GL content from the window in which we're drawning
+        /*// get hold of the GL content from the window in which we're drawning
         GL gl = window.getGL();
 
         // store the current model matrix
@@ -72,7 +72,7 @@ public class JoglSpriteSheet implements SpriteSheetBase{
         gl.glEnd();
 
         // restore the model view matrix to prevent contamination
-        gl.glPopMatrix();
+        gl.glPopMatrix();*/
 
     }
 

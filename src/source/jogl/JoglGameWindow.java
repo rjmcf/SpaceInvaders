@@ -54,7 +54,7 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 
     @Override
     public void startRendering() {
-        canvas = new GLCanvas();
+        /*canvas = new GLCanvas();
         canvas.addGLEventListener(this);
         canvas.setNoAutoRedrawMode(true);
         canvas.setFocusable(true);
@@ -86,7 +86,7 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
         // start a animating thread (provided by JOGL) to actively update
         // the canvas
         animator.start();
-
+        */
     }
 
     @Override
@@ -134,7 +134,7 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 
     @Override
     public void display(GLAutoDrawable glDrawable) {
-        // get hold of the GL content
+       /* // get hold of the GL content
         gl = canvas.getGL();
 
         // clear the screen and setup for rendering
@@ -149,12 +149,12 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
         }
 
         // flush the graphics commands to the card
-        gl.glFlush();
+        gl.glFlush();*/
     }
 
     @Override
     public void reshape(GLAutoDrawable glDrawable, int i, int i1, int i2, int i3) {
-        gl = canvas.getGL();
+        /*gl = canvas.getGL();
 
         // at reshape we're going to tell OPENGL that we'd like to
         // treat the screen on a pixel by pixel basis by telling
@@ -162,13 +162,8 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
         gl.glMatrixMode(GL.GL_PROJECTION);
         gl.glLoadIdentity();
 
-        /**
-         * i=x
-         * i1=y
-         * i2=width
-         * i3=height
-         */
-        gl.glOrtho(0, i2, i3, 0, -1, 1);
+
+        gl.glOrtho(0, i2, i3, 0, -1, 1);*/
     }
     //</editor-fold>
 }
