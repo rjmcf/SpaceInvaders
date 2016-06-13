@@ -1,14 +1,14 @@
 package source;
 
-import java.awt.Canvas;
+import source.lwjgl.LWJGLGameWindow;
+
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Random;
-import javax.swing.JOptionPane;
 
 
-public class Game extends Canvas implements GameWindowCallback{
-    private GameWindow window;
+public class Game  implements GameWindowCallback{
+    private LWJGLGameWindow window;
     private boolean paused = false;
 
     private Random r = new Random();
@@ -40,28 +40,24 @@ public class Game extends Canvas implements GameWindowCallback{
 
     private String windowTitle = "Space Invaders 103 - Version (0.3)";
 
-    public Game(int renderingType) {
+    public Game() {
         // create a window based on a chosen rendering method
-        ResourceFactory.get().setRenderingType(renderingType);
         window = ResourceFactory.get().getGameWindow();
 
         window.setResolution(800,600);
         window.setGameWindowCallback(this);
         window.setTitle(windowTitle);
 
-    }
-
-    public void startRendering() {
         window.startRendering();
     }
 
     @Override
     public void initialise() {
-        gotYou = ResourceFactory.get().getSprite("sprites/gotyou.gif");
+        /*gotYou = ResourceFactory.get().getSprite("sprites/gotyou.gif");
         pressAnyKey = ResourceFactory.get().getSprite("sprites/pressanykey.gif");
         youWin = ResourceFactory.get().getSprite("sprites/youwin.gif");
 
-        message = pressAnyKey;
+        message = pressAnyKey;*/
 
         // setup the initial game state
         startGame();
@@ -70,7 +66,7 @@ public class Game extends Canvas implements GameWindowCallback{
     private void startGame() {
         // clear out any existing entities and intialise a new set
         entities.clear();
-        initEntities();
+        //initEntities();
 
         fireChance = 5000;
     }
@@ -163,6 +159,7 @@ public class Game extends Canvas implements GameWindowCallback{
             window.setTitle(windowTitle+" (FPS: "+currentFrames+")");
             currentFrames = 0;
         }
+        /*
 
         // cycle round asking each entity to move itself
         if (!waitingForKeyPress && !paused) {
@@ -189,12 +186,14 @@ public class Game extends Canvas implements GameWindowCallback{
         }
         ResourceFactory.get().resetAnimationLoop();
 
+
         // cycle round drawing all the entities we have in the game
         for (int i=0;i<entities.size();i++) {
             Entity entity = entities.get(i);
 
             entity.draw();
         }
+
 
         // brute force collisions, compare every entity against
         // every other entity. If any of them collide notify
@@ -227,12 +226,14 @@ public class Game extends Canvas implements GameWindowCallback{
             logicRequiredThisLoop = false;
         }
 
+
         // if we're waiting for an "any key" press then draw the
         // current message
         if (waitingForKeyPress) {
             message.draw(325,250);
         }
 
+        /*
         // resolve the movement of the ship. First assume the ship
         // isn't moving. If either cursor key is pressed then
         // update the movement appropriately
@@ -264,6 +265,7 @@ public class Game extends Canvas implements GameWindowCallback{
             }
         }
 
+
         // if escape has been pressed, stop the game
         if (window.isKeyPressed(KeyEvent.VK_ESCAPE)) {
             System.exit(0);
@@ -271,6 +273,9 @@ public class Game extends Canvas implements GameWindowCallback{
 
         // Wait a bit
         try { Thread.sleep(10); } catch (InterruptedException e) { e.printStackTrace(); }
+        */
+        window.testDraw();
+
     }
 
 
@@ -284,14 +289,6 @@ public class Game extends Canvas implements GameWindowCallback{
 
     // Our entry point to the game
     public static void main(String argv[]) {
-        int result = JOptionPane.showOptionDialog(null,"Java2D or OpenGL?","Java2D or OpenGL?",JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,new String[] {"Java2D","OpenGL"},null);
-
-        if (result == 0) {
-            Game g = new Game(ResourceFactory.JAVA2D);
-            g.startRendering();
-        } else if (result == 1) {
-            Game g = new Game(ResourceFactory.OPENGL_JOGL);
-            g.startRendering();
-        }
+        new Game();
     }
 }
